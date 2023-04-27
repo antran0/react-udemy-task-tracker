@@ -26,7 +26,9 @@ const useHttp = (requestConfig, callbackfn) => {
     setIsLoading(false);
   };
 
-  return [isLoading, error, sendRequest];
+  // same as:
+  //   return { isLoading: isLoading, error: error, sendRequest: sendRequest };
+  return { isLoading, error, sendRequest };
 };
 
 export default useHttp;
