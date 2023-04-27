@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-const useHttp = (callbackfn) => {
+const useHttp = (requestConfig, callbackfn) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
 
@@ -8,9 +8,11 @@ const useHttp = (callbackfn) => {
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(
-        "https://react-udemy-task-tracker-default-rtdb.firebaseio.com/tasks.json"
-      );
+      const response = await fetch(requestConfig.url, {
+        method: requestConfig.method || "GET",
+        headers: requestConfig.headers || {},
+        body: requestConfig.body ? JSON.stringify(requestConfig.body) : null,
+      });
 
       if (!response.ok) {
         throw new Error("Request failed!");

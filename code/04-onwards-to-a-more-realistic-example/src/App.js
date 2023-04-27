@@ -7,15 +7,20 @@ import useHttp from "./hooks/use-http";
 function App() {
   const [tasks, setTasks] = useState([]);
 
-  const [isLoading, error, fetchTasks] = useHttp((data) => {
-    const loadedTasks = [];
+  const [isLoading, error, fetchTasks] = useHttp(
+    {
+      url: "https://react-udemy-task-tracker-default-rtdb.firebaseio.com/tasks.json",
+    },
+    (data) => {
+      const loadedTasks = [];
 
-    for (const taskKey in data) {
-      loadedTasks.push({ id: taskKey, text: data[taskKey].text });
+      for (const taskKey in data) {
+        loadedTasks.push({ id: taskKey, text: data[taskKey].text });
+      }
+
+      setTasks(loadedTasks);
     }
-
-    setTasks(loadedTasks);
-  });
+  );
 
   useEffect(() => {
     fetchTasks();
