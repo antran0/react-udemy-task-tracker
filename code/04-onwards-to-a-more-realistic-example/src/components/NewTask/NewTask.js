@@ -1,41 +1,36 @@
-import { useState } from 'react';
-
-import Section from '../UI/Section';
-import TaskForm from './TaskForm';
+import Section from "../UI/Section";
+import TaskForm from "./TaskForm";
+import useHttp from "../../hooks/use-http";
 
 const NewTask = (props) => {
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { isLoading, error, sendRequest } = useHttp();
 
-  const enterTaskHandler = async (taskText) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(
-        'https://react-http-6b4a6.firebaseio.com/tasks.json',
-        {
-          method: 'POST',
-          body: JSON.stringify({ text: taskText }),
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+  const addNewTask = (taskText, data) => {
+    const generatedId = data.name; // firebase-specific => "name" contains generated id
+    const createdTask = { id: generatedId, text: taskText };
 
-      if (!response.ok) {
-        throw new Error('Request failed!');
-      }
+    props.onAddTask(createdTask);
+  };
 
-      const data = await response.json();
+  const enterTaskHandler = (taskText) => {
+    const requestConfig = {
+      url: "https://react-udemy-task-tracker-default-rtdb.firebaseio.com/tasks.json",
+      method: "POST",
+      body: { text: taskText },
+      headers: {
+        "Content-Type": "application/json",
+      },
+    };
 
-      const generatedId = data.name; // firebase-specific => "name" contains generated id
-      const createdTask = { id: generatedId, text: taskText };
-
-      props.onAddTask(createdTask);
-    } catch (err) {
-      setError(err.message || 'Something went wrong!');
-    }
-    setIsLoading(false);
+    // The first argument is 'this' and is set to null because
+    // we don't need 'this' here.
+    // The second argument, taskText, will be the first argument passed to
+    // addNewTask while 'data' will still be passed as usual.
+    //
+    // This needs to be done to ensure that taskText received from the form is
+    // made available to the callbackfn 'addNewTask' that is passed to useHttp
+    // because this callbackfn is called with only one argument.
+    sendRequest(requestConfig, addNewTask.bind(null, taskText));
   };
 
   return (
