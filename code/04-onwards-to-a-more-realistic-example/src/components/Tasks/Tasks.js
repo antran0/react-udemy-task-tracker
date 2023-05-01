@@ -1,6 +1,6 @@
-import Section from '../UI/Section';
-import TaskItem from './TaskItem';
-import classes from './Tasks.module.css';
+import Section from "../UI/Section";
+import TaskItem from "./TaskItem";
+import classes from "./Tasks.module.css";
 
 const Tasks = (props) => {
   let taskList = <h2>No tasks found. Start adding some!</h2>;
@@ -8,8 +8,13 @@ const Tasks = (props) => {
   if (props.items.length > 0) {
     taskList = (
       <ul>
-        {props.items.map((task) => (
-          <TaskItem key={task.id}>{task.text}</TaskItem>
+        {props.items.map((task, index) => (
+          <TaskItem key={task.id}>
+            <div>{task.text}</div>
+            <button type="button" onClick={() => clickHandler(index)}>
+              &#10003;
+            </button>
+          </TaskItem>
         ))}
       </ul>
     );
@@ -22,7 +27,23 @@ const Tasks = (props) => {
   }
 
   if (props.loading) {
-    content = 'Loading tasks...';
+    content = "Loading tasks...";
+  }
+
+  function clickHandler(index) {
+    const task = props.items[index];
+    const url =
+      "https://react-udemy-task-tracker-default-rtdb.firebaseio.com/tasks/".concat(
+        `${task.id}.json`
+      );
+
+    const requestConfig = {
+      url: url,
+      method: "DELETE",
+    };
+
+    props.onFetch(requestConfig, (data) => {});
+    props.onDeleteTask(index);
   }
 
   return (
